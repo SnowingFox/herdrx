@@ -15,6 +15,7 @@ pub mod mirror_sync;
 pub mod model;
 pub mod paths;
 pub mod persist;
+pub mod place;
 pub mod process_cwd;
 pub mod programs;
 pub mod settings;

@@ -1,4 +1,5 @@
 use super::*;
+use std::time::Duration;
 use gpui::{IntoElement, Render, TestAppContext, VisualTestContext};
 use std::ops::Deref;
 use gpui_shell::{ShellRoot, ShellRuntime, policy::Policy};

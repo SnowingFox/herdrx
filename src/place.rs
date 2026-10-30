@@ -1,48 +1,14 @@
-//! Where the window was: its size, its place on which display, and whether it
-//! was maximized or full screen. Kept in `window.json` so the next start opens
-//! it the same way.
+//! Opening the window where it was, and noting where it goes: the GPUI side
+//! of `window.json` (`herdr_shared::place`).
 
 use std::cell::RefCell;
-use std::path::PathBuf;
-use std::time::Duration;
 
 use gpui::{App, Bounds, DisplayId, Pixels, Task, Window, WindowBounds, point, px, size};
-use serde::{Deserialize, Serialize};
-
-/// The first start's size.
-const FIRST: (f32, f32) = (1280.0, 820.0);
-/// Writes wait for a drag or resize to settle.
-const SETTLE: Duration = Duration::from_millis(400);
-
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-enum State {
-    Windowed,
-    Maximized,
-    Fullscreen,
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Place {
-    state: State,
-    /// x, y, width, height of the window when not maximized (what un-maximizing
-    /// goes back to), in the display's coordinates.
-    bounds: [f32; 4],
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    display: Option<String>,
-}
+use herdr_shared::place::{FIRST, Place, SETTLE, State, load, write};
 
 thread_local! {
     /// The place now, as last seen; written to disk once it settles.
     static NOW: RefCell<Option<Place>> = RefCell::new(load());
-}
-
-fn path() -> PathBuf {
-    crate::mods::app_dir().join("window.json")
-}
-
-fn load() -> Option<Place> {
-    std::fs::read_to_string(path()).ok().and_then(|s| serde_json::from_str(&s).ok())
 }
 
 fn uuid(d: &dyn gpui::PlatformDisplay) -> Option<String> {
@@ -95,12 +61,6 @@ fn note(window: &Window, cx: &App) -> Option<Place> {
         *n = Some(place.clone());
         Some(place)
     })
-}
-
-fn write(p: &Place) {
-    if let Ok(s) = serde_json::to_string_pretty(p) {
-        let _ = crate::persist::write_atomic(&path(), s + "\n");
-    }
 }
 
 /// After the window moved or resized: written once it settles (the task

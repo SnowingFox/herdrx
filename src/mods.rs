@@ -1,7 +1,7 @@
 //! Mods: folders of JavaScript under ~/.config/herdr-app/mods that agents write and
 //! Herdr runs live (gpui-shell), plus the `herdr` module they import.
 
-pub use herdr_shared::exec::{run_blocking, run_here, run_on, run_remote};
+pub use herdr_shared::exec::{run_blocking, run_remote};
 use crate::layout::Node;
 use gpui::App;
 use gpui_shell::{Capabilities, ExecuteGrant, HostError, HostModule, HostObject, HostValue, NetworkGrant};
@@ -9,9 +9,8 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
-use std::process::Stdio;
 use std::sync::OnceLock;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 
 include!(concat!(env!("OUT_DIR"), "/default_mods.rs"));
 include!(concat!(env!("OUT_DIR"), "/frame_mods.rs"));
