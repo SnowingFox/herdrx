@@ -24,11 +24,14 @@ export function Spike() {
   const [mode, setMode] = useState("shell");
   const [run, setRun] = useState(0);
   const [auto, setAuto] = useState(false);
+  // Panes wait for the unattended config, so no stray shell starts first.
+  const [ready, setReady] = useState(false);
   const stats = useRef<Stats[]>([]);
   const [rate, setRate] = useState("");
 
   useEffect(() => {
     invoke<string | null>("spike_config").then((c) => {
+      setReady(true);
       if (!c) return;
       const [n, m] = c.split(":");
       setCount(+n);
@@ -41,6 +44,7 @@ export function Spike() {
   if (stats.current.length !== count) stats.current = Array.from({ length: count }, fresh);
 
   useEffect(() => {
+    if (!ready) return;
     const s = stats.current;
     const started = performance.now();
     const latencies: number[] = [];
@@ -82,7 +86,7 @@ export function Spike() {
       clearInterval(tick);
       if (probe) clearInterval(probe);
     };
-  }, [run, auto]);
+  }, [run, auto, ready]);
 
   const cols = Math.ceil(Math.sqrt(count));
 
@@ -111,7 +115,7 @@ export function Spike() {
         <span className="ml-auto font-mono text-xs text-neutral-400">{rate}</span>
       </div>
       <div key={`${run}-${count}-${mode}`} className="grid min-h-0 flex-1 gap-1 p-1" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-        {stats.current.map((s, i) => (
+        {ready && stats.current.map((s, i) => (
           <TerminalPane key={i} argv={argvFor(mode, i)} stats={s} />
         ))}
       </div>

@@ -5,6 +5,7 @@
 use herdr_shared::{core_bin, hc};
 use serde::Serialize;
 use serde_json::{Value, json};
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::State;
@@ -13,6 +14,8 @@ use tauri::ipc::{Channel, InvokeResponseBody};
 #[derive(Default)]
 pub struct Terminals {
     core: Mutex<Option<Arc<hc::Core>>>,
+    /// The terminal each attached channel shows: closing the pane ends it.
+    started: Mutex<HashMap<u32, String>>,
 }
 
 impl Terminals {
@@ -27,6 +30,16 @@ impl Terminals {
         hc::check(&c.hello).map_err(|m| format!("this core can't serve the app: {m:?}"))?;
         *core = Some(c.clone());
         Ok(c)
+    }
+}
+
+impl Terminals {
+    /// Ends every program this app started (the window is going away).
+    pub fn kill_all(&self) {
+        let Some(core) = self.core.lock().unwrap().clone() else { return };
+        for (_, address) in self.started.lock().unwrap().drain() {
+            let _ = core.call("terminal.kill", json!({ "terminal": address }));
+        }
     }
 }
 
@@ -56,8 +69,11 @@ pub fn term_open(
 ) -> Result<Opened, String> {
     let core = state.core()?;
     let argv = argv.unwrap_or_else(|| vec![std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into()), "-l".into()]);
+    // Kept like the GPUI app's terminals (a terminal started with keep: false
+    // stalled with several panes open: herdr-core 0.1.14); closing kills it.
     let address = core.run(argv, None, json!({}), None).map_err(|e| format!("{e:#}"))?;
     let attached = core.attach(&address, cols, rows, json!({})).map_err(|e| format!("{e:#}"))?;
+    state.started.lock().unwrap().insert(attached.channel, address);
     let stream = attached.stream;
     std::thread::spawn(move || forward(stream, on_data, on_end));
     Ok(Opened { channel: attached.channel, terminal: attached.terminal })
@@ -134,6 +150,11 @@ pub fn term_focus(state: State<'_, Terminals>, channel: u32, focused: bool) -> R
 
 #[tauri::command]
 pub fn term_close(state: State<'_, Terminals>, channel: u32) -> Result<(), String> {
-    state.core()?.detach(channel);
+    let core = state.core()?;
+    core.detach(channel);
+    // The spike starts its own programs; none should outlive its pane.
+    if let Some(address) = state.started.lock().unwrap().remove(&channel) {
+        let _ = core.call("terminal.kill", json!({ "terminal": address }));
+    }
     Ok(())
 }

@@ -7,9 +7,10 @@ pub fn spike_config() -> Option<String> {
 }
 
 #[tauri::command]
-pub fn spike_report(app: tauri::AppHandle, line: String, done: bool) {
+pub fn spike_report(app: tauri::AppHandle, terminals: tauri::State<'_, crate::term::Terminals>, line: String, done: bool) {
     println!("SPIKE {line}");
     if done {
+        terminals.kill_all();
         app.exit(0);
     }
 }
