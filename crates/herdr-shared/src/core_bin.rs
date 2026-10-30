@@ -20,7 +20,7 @@ static BIN: OnceLock<PathBuf> = OnceLock::new();
 #[cfg(target_os = "macos")]
 pub fn install_cli_link() {
     if let Err(e) = std::thread::Builder::new().name("cli-link".into()).spawn(|| {
-        let result = std::env::current_exe().and_then(|exe| cli_link::ensure(&crate::mods::home(), &exe));
+        let result = std::env::current_exe().and_then(|exe| cli_link::ensure(&crate::paths::home(), &exe));
         if let Err(e) = result {
             tracing::warn!("cannot install herdr-app CLI link: {e}");
         }
@@ -55,7 +55,7 @@ pub fn fill_path() {
     if std::os::unix::process::parent_id() != 1 {
         return;
     }
-    let home = crate::mods::home();
+    let home = crate::paths::home();
     let current = std::env::var_os("PATH").unwrap_or_default();
     if let Some(path) = merged_path(login_shell_path().as_deref(), &usual_dirs(&home)[..3], &current) {
         // SAFETY: called at startup, before other threads read the environment.
@@ -82,7 +82,7 @@ pub fn version(bin: &Path) -> Option<String> {
 
 /// The first herdr-core found, or None.
 pub fn find(configured: Option<&str>) -> Option<PathBuf> {
-    let home = crate::mods::home();
+    let home = crate::paths::home();
     let pick = |candidates: Vec<PathBuf>| candidates.into_iter().filter(|c| c.is_file()).find(|c| version(c).is_some());
     if let Some(found) = pick(configured.map(|c| vec![expand(c, &home)]).unwrap_or_default()) {
         return Some(found);
@@ -179,7 +179,7 @@ pub fn install() -> Result<PathBuf, String> {
         let err = String::from_utf8_lossy(&out.stderr).trim().to_owned();
         return Err(if err.is_empty() { "the installer failed".into() } else { err });
     }
-    let home = crate::mods::home();
+    let home = crate::paths::home();
     let dir = std::env::var_os("HC_INSTALL_DIR").map(PathBuf::from).unwrap_or_else(|| {
         if cfg!(windows) {
             usual_dirs(&home).remove(0)

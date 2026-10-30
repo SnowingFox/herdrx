@@ -1,12 +1,12 @@
 // Windows: a window app, no console of its own (see `attach_console`).
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
+use herdr_shared::{core_bin, hc, spawn};
+
 mod bench;
 mod commands;
 mod control;
-mod core_bin;
 mod files;
-mod hc;
 mod keys;
 mod layout;
 mod layout_sync;
@@ -25,7 +25,6 @@ mod programs;
 mod settings;
 mod setup;
 mod sound;
-mod spawn;
 mod sprites;
 mod telemetry;
 mod feedback;

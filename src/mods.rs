@@ -28,8 +28,7 @@ pub fn frame_dir() -> PathBuf {
 }
 
 pub fn home() -> PathBuf {
-    // HOME, or the profile folder on Windows.
-    std::env::home_dir().unwrap_or_else(|| "/".into())
+    herdr_shared::paths::home()
 }
 
 /// The fonts on this machine (`fonts()`): read when the window opens and
@@ -47,8 +46,7 @@ pub fn note_fonts(cx: &gpui::App) {
 /// The app's home: `$HERDR_APP_HOME` (tests, experiments), else
 /// `$XDG_CONFIG_HOME/herdr-app`, else `~/.config/herdr-app`, on every OS.
 pub fn app_dir() -> PathBuf {
-    let env = |k: &str| std::env::var_os(k).filter(|v| !v.is_empty()).map(PathBuf::from);
-    env("HERDR_APP_HOME").unwrap_or_else(|| env("XDG_CONFIG_HOME").unwrap_or_else(|| home().join(".config")).join("herdr-app"))
+    herdr_shared::paths::app_dir()
 }
 
 pub fn mods_dir() -> PathBuf {

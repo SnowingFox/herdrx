@@ -3707,6 +3707,7 @@ dependencies = [
  "gpui-pre-platform",
  "gpui-pre-windows",
  "gpui-shell",
+ "herdr-shared",
  "image",
  "libc",
  "notify",
@@ -3722,6 +3723,16 @@ dependencies = [
  "uds_windows",
  "windows-sys 0.61.2",
  "winresource",
+]
+
+[[package]]
+name = "herdr-shared"
+version = "0.1.9"
+dependencies = [
+ "anyhow",
+ "async-channel",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

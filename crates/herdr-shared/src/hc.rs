@@ -188,7 +188,7 @@ pub enum Mismatch {
 
 /// The oldest core this app works with (distribution/core-version).
 pub fn core_min() -> &'static str {
-    include_str!("../distribution/core-version").trim()
+    include_str!("../../../distribution/core-version").trim()
 }
 
 fn semver(v: &str) -> (u64, u64, u64) {
