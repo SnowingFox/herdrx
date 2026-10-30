@@ -7,24 +7,10 @@ use std::ffi::c_void;
 use std::rc::Rc;
 use std::time::{Duration, Instant};
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
-pub struct Rgb(pub u8, pub u8, pub u8);
+pub use crate::settings::Rgb;
 
-impl From<GhosttyColorRgb> for Rgb {
-    fn from(c: GhosttyColorRgb) -> Self {
-        Rgb(c.r, c.g, c.b)
-    }
-}
-
-impl Rgb {
-    /// WCAG relative luminance.
-    fn luminance(self) -> f32 {
-        let ch = |v: u8| {
-            let v = v as f32 / 255.0;
-            if v <= 0.03928 { v / 12.92 } else { ((v + 0.055) / 1.055).powf(2.4) }
-        };
-        0.2126 * ch(self.0) + 0.7152 * ch(self.1) + 0.0722 * ch(self.2)
-    }
+fn rgb_of(c: GhosttyColorRgb) -> Rgb {
+    Rgb(c.r, c.g, c.b)
 }
 
 fn contrast(a: Rgb, b: Rgb) -> f32 {
@@ -857,8 +843,8 @@ impl Vt {
 
             let mut colors = GhosttyRenderStateColors { size: std::mem::size_of::<GhosttyRenderStateColors>(), ..Default::default() };
             ghostty_render_state_get(state, GHOSTTY_RENDER_STATE_DATA_COLORS, &mut colors as *mut _ as *mut c_void);
-            let fg_default = Rgb::from(colors.foreground);
-            let bg_default = Rgb::from(colors.background);
+            let fg_default = rgb_of(colors.foreground);
+            let bg_default = rgb_of(colors.background);
 
             // Rows libghostty keeps clean are taken as read last frame (see
             // "Row Identity" in its render.h); a resize or new colors (which
@@ -914,7 +900,7 @@ impl Vt {
                     GHOSTTY_RENDER_STATE_CURSOR_VISUAL_STYLE_BLOCK_HOLLOW => CursorShape::Hollow,
                     _ => CursorShape::Block,
                 },
-                color: if colors.cursor_has_value { colors.cursor.into() } else { fg_default },
+                color: if colors.cursor_has_value { rgb_of(colors.cursor) } else { fg_default },
             });
 
             self.drawn = self.drawable();
@@ -939,14 +925,14 @@ impl Vt {
             let fg = if ghostty_render_state_row_cells_get(c, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_FG_COLOR, &mut fg as *mut _ as *mut c_void)
                 == GHOSTTY_SUCCESS
             {
-                Rgb::from(fg)
+                rgb_of(fg)
             } else {
                 fg_default
             };
             let mut bg = GhosttyColorRgb::default();
             let bg = (ghostty_render_state_row_cells_get(c, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_BG_COLOR, &mut bg as *mut _ as *mut c_void)
                 == GHOSTTY_SUCCESS)
-                .then(|| Rgb::from(bg));
+                .then(|| rgb_of(bg));
 
             let (mut fg, mut bg) = (fg, bg);
             if style.inverse {

@@ -14,5 +14,6 @@ pub mod model;
 pub mod paths;
 pub mod persist;
 pub mod process_cwd;
+pub mod settings;
 pub mod spawn;
 pub mod win32_keys;
