@@ -725,6 +725,30 @@ pub fn snap(x: f32, y: f32, w: f32, h: f32) -> (Edge, Align) {
     (edge, align)
 }
 
+/// The shipped layouts (defaults/layouts): `main` is Herdr's window (spaces
+/// sidebar, tab bar).
+pub const LAYOUTS: &[(&str, &str)] = &[
+    ("main", include_str!("../../../defaults/layouts/main.json")),
+    ("terminals", include_str!("../../../defaults/layouts/terminals.json")),
+    ("win98", include_str!("../../../defaults/layouts/win98.json")),
+];
+
+/// Pictures shipped layouts name as their `preview`, written beside them.
+pub const LAYOUT_PREVIEWS: &[(&str, &str)] = &[("win98.svg", include_str!("../../../defaults/layouts/win98.svg"))];
+
+pub fn shipped_layouts() -> Vec<&'static str> {
+    LAYOUTS.iter().map(|(n, _)| *n).collect()
+}
+
+pub fn shipped_layout(name: &str) -> &'static str {
+    LAYOUTS.iter().find(|(n, _)| *n == name).unwrap_or(&LAYOUTS[0]).1
+}
+
+/// A layout as shipped (main for names Herdr doesn't ship).
+pub fn default_layout(name: &str) -> Node {
+    serde_json::from_str(shipped_layout(name)).expect("defaults/layouts are valid")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
