@@ -3731,6 +3731,10 @@ version = "0.1.9"
 dependencies = [
  "anyhow",
  "async-channel",
+ "fancy-regex 0.19.2",
+ "libc",
+ "notify",
+ "serde",
  "serde_json",
  "tracing",
 ]

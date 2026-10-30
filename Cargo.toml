@@ -1,5 +1,7 @@
 [workspace]
 members = ["crates/ghostty-sys", "crates/herdr-shared"]
+# The app and the logic it shares with the Tauri app: `cargo test` covers both.
+default-members = [".", "crates/herdr-shared"]
 exclude = ["apps/desktop/src-tauri", "vendor/gpui-kit", "vendor/gpui-pre", "vendor/gpui-pre-wgpu", "vendor/gpui-pre-apple", "vendor/gpui-pre-linux", "vendor/gpui-pre-macos", "vendor/gpui-pre-windows", "vendor/taffy", "vendor/quickjs-jit-runtime", "vendor/zed-xim", "vendor/xim-ctext"]
 resolver = "2"
 

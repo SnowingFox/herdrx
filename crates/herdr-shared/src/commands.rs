@@ -165,7 +165,7 @@ mod tests {
     /// The guide agents read (written to the home folder) names every command.
     #[test]
     fn the_guide_names_every_command() {
-        let guide = include_str!("../defaults/AGENTS.md");
+        let guide = include_str!("../../../defaults/AGENTS.md");
         let missing: Vec<&str> = COMMANDS.iter().map(|c| c.name).filter(|n| !guide.contains(&format!("`{n}"))).collect();
         assert!(missing.is_empty(), "defaults/AGENTS.md (## Commands) doesn't name: {missing:?}");
     }

@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Follow file symlinks, including relative links and links to missing files.
-pub(crate) fn resolve_target(path: &Path) -> std::io::Result<PathBuf> {
+pub fn resolve_target(path: &Path) -> std::io::Result<PathBuf> {
     let mut target = path.to_path_buf();
     for _ in 0..40 {
         match std::fs::symlink_metadata(&target) {

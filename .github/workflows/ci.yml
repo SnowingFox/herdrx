@@ -87,6 +87,10 @@ jobs:
             threads=(-- --test-threads 4)
           fi
           cargo test --locked --config 'profile.dev.package."*".opt-level=0' "${only[@]}" "${threads[@]}"
+          # --bins skips libraries: the shared logic's tests run on their own.
+          if [ "$RUNNER_OS" != Linux ]; then
+            cargo test --locked --config 'profile.dev.package."*".opt-level=0' -p herdr-shared
+          fi
       # Windows runners lack an interactive desktop. Linux uses headless Vulkan
       # in the suite above; macOS exercises the native window renderer here.
       - name: Screenshot pixels

@@ -1,26 +1,16 @@
 // Windows: a window app, no console of its own (see `attach_console`).
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
-use herdr_shared::{core_bin, hc, spawn};
+use herdr_shared::{commands, core_bin, files, hc, layout, layout_sync, links, mirror, mirror_sync, model, persist, process_cwd, spawn, win32_keys};
 
 mod bench;
-mod commands;
 mod control;
-mod files;
 mod keys;
-mod layout;
-mod layout_sync;
-mod links;
-mod model;
-mod mirror;
-mod mirror_sync;
 mod place;
-mod persist;
 #[cfg(target_os = "macos")]
 mod macos;
 mod mods;
 mod mod_files;
-mod process_cwd;
 mod programs;
 mod settings;
 mod setup;
@@ -32,7 +22,6 @@ mod terminal;
 mod update;
 mod update_notes;
 mod vt;
-mod win32_keys;
 mod window;
 
 use gpui::*;

@@ -404,7 +404,7 @@ mod tests {
                 }
             }
         }
-        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("defaults/layouts");
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../defaults/layouts");
         for entry in std::fs::read_dir(dir).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().and_then(|e| e.to_str()) != Some("json") {
