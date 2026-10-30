@@ -615,6 +615,25 @@ pub fn publish_focused(v: Value) -> bool {
     publish(|s| (std::mem::replace(&mut s.focused, v.clone()), v))
 }
 
+/// Everything a mod can read, as one value: `herdr-app snapshot`.
+pub fn snapshot_json() -> Value {
+    let keys: Vec<Value> = crate::keys::listing().into_iter().map(|(s, k, a)| json!({ "section": s, "keys": k, "action": a })).collect();
+    let shared = with_shared(|s| serde_json::to_value(&s.values).unwrap_or(Value::Null));
+    SNAPSHOT.with(|s| {
+        let s = s.borrow();
+        json!({
+            "layout": s.layout, "spaces": s.spaces, "machines": s.machines, "agents": s.agents,
+            "panes": s.panes, "terminals": s.terminals, "focused": s.focused, "floats": s.floats, "window": s.window,
+            "theme": serde_json::to_value(&*crate::settings::theme()).unwrap_or(Value::Null),
+            "settings": serde_json::to_value(&*crate::settings::get()).unwrap_or(Value::Null),
+            "fonts": *FONTS.lock().unwrap(),
+            "layouts": crate::window::layout_names(),
+            "keys": keys,
+            "shared": shared,
+        })
+    })
+}
+
 fn read(f: impl FnOnce(&Snapshot) -> &Value) -> HostValue {
     SNAPSHOT.with(|s| to_host(f(&s.borrow())))
 }

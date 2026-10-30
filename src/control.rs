@@ -89,12 +89,13 @@ pub fn client(args: &[String]) -> i32 {
         },
         [verb] if verb == "status" => json!({ "status": true }),
         [verb] if verb == "ls" => json!({ "ls": true }),
+        [verb] if verb == "snapshot" => json!({ "snapshot": true }),
         [verb, message] if verb == "feedback" => json!({ "do": "app.feedback", "args": { "message": message, "from": "agent" } }),
         [verb, command, rest @ ..] if verb == "do" => match parse_args(rest) {
             Ok(a) => json!({ "do": command, "args": a }),
             Err(e) => return fail(&e),
         },
-        _ => return fail("usage: herdr-app ls | herdr-app commands | herdr-app status | herdr-app shot [file.png] | herdr-app do <command> [--arg value ... | json]"),
+        _ => return fail("usage: herdr-app ls | herdr-app snapshot | herdr-app commands | herdr-app status | herdr-app shot [file.png] | herdr-app do <command> [--arg value ... | json]"),
     };
     let mut stream = match UnixStream::connect(socket()) {
         Ok(s) => s,

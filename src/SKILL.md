@@ -11,6 +11,7 @@ Your terminal address is `$HC_TERMINAL_ID`; it is not a pane ID.
 ```sh
 herdr-app ls          # spaces > tabs > terminals, including pane IDs
 herdr-app status      # current layout, focus, overlays, zoom and file/mod errors
+herdr-app snapshot    # everything mods read: spaces, panes, agents, theme, settings, keys, shared
 herdr-app commands    # available commands, arguments and descriptions
 ```
 

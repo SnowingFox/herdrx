@@ -561,6 +561,7 @@ herdr-app do tab.new --name "fix login" --argv '["claude"]' --task "look at the 
 herdr-app do pane.split:right
 herdr-app ls          # spaces, their tabs and terminals (sub-agents under their parent)
 herdr-app status      # what's on screen: layout, focus, overlays, zoom, errors from files and mods
+herdr-app snapshot    # everything mods read (spaces, panes, agents, theme, settings, keys, shared) as JSON
 herdr-app commands    # every command and its arguments
 ```
 

@@ -3413,6 +3413,12 @@ impl AppWindow {
         if cmd.get("ls").is_some() {
             return self.world();
         }
+        if cmd.get("snapshot").is_some() {
+            let mut s = mods::snapshot_json();
+            s["layout_name"] = json!(self.layout_name);
+            s["chrome"] = serde_json::to_value(&self.chrome).unwrap_or(Value::Null);
+            return s;
+        }
         if cmd.get("status").is_some() {
             let round = |v: f32| (v as f64 * 100.0).round() / 100.0;
             let errors: Vec<String> = ["settings", "keys", "layout", "programs"]
@@ -3438,7 +3444,7 @@ impl AppWindow {
                 "errors": errors,
             });
         }
-        json!({ "error": "expected { do }, { ls }, { commands } or { status }" })
+        json!({ "error": "expected { do }, { ls }, { snapshot }, { commands } or { status }" })
     }
 
     /// Spaces, their tabs and terminals, for `herdr-app ls`. Sub-agents are listed
