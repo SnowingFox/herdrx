@@ -16,5 +16,6 @@ pub mod paths;
 pub mod persist;
 pub mod process_cwd;
 pub mod settings;
+pub mod sound;
 pub mod spawn;
 pub mod win32_keys;

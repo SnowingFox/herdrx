@@ -1,7 +1,7 @@
 // Windows: a window app, no console of its own (see `attach_console`).
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
-use herdr_shared::{commands, core_bin, files, hc, layout, layout_sync, links, mirror, mirror_sync, model, persist, process_cwd, spawn, win32_keys};
+use herdr_shared::{commands, core_bin, files, hc, layout, layout_sync, links, mirror, mirror_sync, model, persist, process_cwd, sound, spawn, win32_keys};
 
 mod bench;
 mod control;
@@ -14,7 +14,6 @@ mod mod_files;
 mod programs;
 mod settings;
 mod setup;
-mod sound;
 mod sprites;
 mod telemetry;
 mod feedback;

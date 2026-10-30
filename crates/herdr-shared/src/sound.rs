@@ -9,8 +9,8 @@ use std::process::Stdio;
 #[cfg(not(windows))]
 use std::time::{Duration, Instant};
 
-const DONE: &[u8] = include_bytes!("../assets/sounds/done.mp3");
-const BLOCKED: &[u8] = include_bytes!("../assets/sounds/request.mp3");
+const DONE: &[u8] = include_bytes!("../../../assets/sounds/done.mp3");
+const BLOCKED: &[u8] = include_bytes!("../../../assets/sounds/request.mp3");
 
 /// Players that decode MP3, tried in order (never bare `aplay`: it plays MP3 bytes as noise).
 #[cfg(not(windows))]
@@ -50,7 +50,7 @@ pub fn play(sound: &str) {
 
 fn resolve(path: &str) -> PathBuf {
     let p = PathBuf::from(path);
-    if p.is_absolute() { p } else { crate::mods::app_dir().join(p) }
+    if p.is_absolute() { p } else { crate::paths::app_dir().join(p) }
 }
 
 /// The file settings.json names for `done` / `blocked`, if any.
