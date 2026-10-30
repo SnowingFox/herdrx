@@ -1,6 +1,6 @@
-//! Embeds the default mods (defaults/mods/**), the program icons
-//! (defaults/icons/*) and the frame's mods (defaults/frame/**) so Herdr can
-//! install them.
+//! Embeds the default mods (defaults/mods/**) and the frame's mods
+//! (defaults/frame/**) so Herdr can install them. Program icons are
+//! herdr-shared's.
 //!
 //! Worktrees may share one target dir, and with it this script and its output.
 //! So nothing here names this checkout: paths are relative to the package and
@@ -36,7 +36,6 @@ fn embed(base: &Path, folder: &str, name: &str, file: &str) {
 fn main() {
     let base = std::path::PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     embed(&base, "defaults/mods", "DEFAULT_MODS", "default_mods.rs");
-    embed(&base, "defaults/icons", "DEFAULT_ICONS", "default_icons.rs");
     embed(&base, "defaults/frame", "FRAME_MODS", "frame_mods.rs");
 
     // Windows takes the window, taskbar and Start menu icon from the program file.

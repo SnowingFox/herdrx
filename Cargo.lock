@@ -3731,6 +3731,7 @@ version = "0.1.9"
 dependencies = [
  "anyhow",
  "async-channel",
+ "base64",
  "fancy-regex 0.19.2",
  "libc",
  "notify",

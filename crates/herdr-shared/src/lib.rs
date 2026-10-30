@@ -3,6 +3,7 @@
 
 pub mod commands;
 pub mod core_bin;
+pub mod exec;
 pub mod files;
 pub mod hc;
 pub mod keys;
@@ -15,6 +16,7 @@ pub mod model;
 pub mod paths;
 pub mod persist;
 pub mod process_cwd;
+pub mod programs;
 pub mod settings;
 pub mod sound;
 pub mod spawn;

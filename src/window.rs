@@ -98,14 +98,7 @@ fn mtime(p: &std::path::Path) -> Option<SystemTime> {
     std::fs::metadata(p).ok()?.modified().ok()
 }
 
-pub fn shell() -> String {
-    if cfg!(windows) {
-        let path = std::env::var_os("PATH").unwrap_or_default();
-        let pwsh = std::env::split_paths(&path).any(|d| d.join("pwsh.exe").is_file());
-        return if pwsh { "pwsh.exe" } else { "powershell.exe" }.into();
-    }
-    std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into())
-}
+pub use herdr_shared::exec::shell;
 
 fn unix_agent_argv(sh: String, cmd: Vec<String>) -> Vec<String> {
     let script = if std::path::Path::new(&sh).file_name().and_then(|s| s.to_str()) == Some("fish") {

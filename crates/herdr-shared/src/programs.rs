@@ -10,7 +10,7 @@ use serde_json::{Value, json};
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 
-const BUILT_IN: &str = include_str!("../defaults/programs.json");
+const BUILT_IN: &str = include_str!("../../../defaults/programs.json");
 include!(concat!(env!("OUT_DIR"), "/default_icons.rs"));
 
 #[derive(Deserialize, Default)]
@@ -96,17 +96,17 @@ pub fn installed(commands: &[String], on: Option<&str>) -> Vec<String> {
         Some(m) => {
             let mut args = vec!["-c".to_owned(), check.to_owned(), "sh".to_owned()];
             args.extend(commands.iter().cloned());
-            crate::mods::run_on(m, "sh", &args).unwrap_or_default()
+            crate::exec::run_on(m, "sh", &args).unwrap_or_default()
         }
         None if cfg!(windows) => {
             let list = commands.iter().map(|c| format!("'{}'", c.replace('\'', "''"))).collect::<Vec<_>>().join(",");
             let script = format!("foreach($c in @({list})){{ if(Get-Command $c -ErrorAction SilentlyContinue){{ \"herdr-has:$c\" }} }}");
-            crate::mods::run_here(&crate::window::shell(), &["-NoLogo".into(), "-Command".into(), script]).unwrap_or_default()
+            crate::exec::run_here(&crate::exec::shell(), &["-NoLogo".into(), "-Command".into(), script]).unwrap_or_default()
         }
         None => {
-            let shell = crate::window::shell();
+            let shell = crate::exec::shell();
             let line = installed_line(commands, base(&shell) == "fish");
-            crate::mods::run_here(&shell, &["-ic".into(), line]).unwrap_or_default()
+            crate::exec::run_here(&shell, &["-ic".into(), line]).unwrap_or_default()
         }
     };
     let found: std::collections::HashSet<&str> = out.split("herdr-has:").skip(1).filter_map(|s| s.split_whitespace().next()).collect();
@@ -131,12 +131,12 @@ thread_local! {
 }
 
 pub fn path() -> std::path::PathBuf {
-    crate::mods::app_dir().join("programs.json")
+    crate::paths::app_dir().join("programs.json")
 }
 
 /// Writes the shipped icons into the home folder.
 pub fn install_icons() {
-    let dir = crate::mods::app_dir().join("icons");
+    let dir = crate::paths::app_dir().join("icons");
     let _ = std::fs::create_dir_all(&dir);
     for (name, bytes) in DEFAULT_ICONS {
         let file = dir.join(name);
