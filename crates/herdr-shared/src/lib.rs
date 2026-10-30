@@ -5,6 +5,7 @@ pub mod commands;
 pub mod core_bin;
 pub mod files;
 pub mod hc;
+pub mod keys;
 pub mod layout;
 pub mod layout_sync;
 pub mod links;
