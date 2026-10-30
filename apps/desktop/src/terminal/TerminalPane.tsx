@@ -33,8 +33,11 @@ export function TerminalPane({ argv, stats }: { argv?: string[]; stats: Stats })
     let channel: number | undefined;
     let gone = false;
     let owed = 0;
+    // Bytes can arrive before term_open resolves: they stay owed until the
+    // channel is known, or the core's window shrinks for good.
     const payCredit = () => {
-      if (channel !== undefined && owed > 0) core.credit(channel, owed);
+      if (channel === undefined || owed === 0) return;
+      core.credit(channel, owed);
       owed = 0;
     };
     const disposers: { dispose(): void }[] = [];
@@ -55,8 +58,8 @@ export function TerminalPane({ argv, stats }: { argv?: string[]; stats: Stats })
           stats.writeMs = (stats.writeMs ?? 0) + performance.now() - t0;
           stats.chunks = (stats.chunks ?? 0) + 1;
           stats.parsed += bytes.length;
+          if (owed === 0) queueMicrotask(payCredit);
           owed += bytes.length;
-          if (owed === bytes.length) queueMicrotask(payCredit);
         },
         (e) => {
           stats.ended = true;

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Builds the Tauri terminal spike (apps/desktop) and prints its numbers for
+# 1, 4 and 9 busy panes. Runs against its own core session and a scratch
+# home, so the Herdr you use is untouched. Opens one window per run.
+#
+#   scripts/spike-bench            # release build
+#   scripts/spike-bench --debug
+set -euo pipefail
+cd "$(dirname "$0")/../apps/desktop"
+
+need() { command -v "$1" >/dev/null || { echo "spike-bench: $1 is missing: $2" >&2; exit 1; }; }
+need cargo "install Rust from https://rustup.rs"
+need pnpm "npm i -g pnpm"
+need hc "curl -fsSL https://releases.herdr.dev/core/install.sh | sh"
+if [[ $(uname) == Linux ]]; then
+  pkg-config --exists webkit2gtk-4.1 || { echo "spike-bench: install Tauri's Linux deps: https://v2.tauri.app/start/prerequisites/#linux" >&2; exit 1; }
+fi
+
+profile=release
+[[ ${1:-} == --debug ]] && profile=debug
+pnpm install --frozen-lockfile >/dev/null
+if [[ $profile == debug ]]; then pnpm tauri build --debug --no-bundle >/dev/null; else pnpm tauri build --no-bundle >/dev/null; fi
+bin=src-tauri/target/$profile/herdr-desktop
+
+export HC_SESSION=herdrx-spike-bench
+home=$(mktemp -d)
+trap 'hc server stop >/dev/null 2>&1 || true; rm -rf "$home"' EXIT
+
+if [[ $(uname) == Linux ]]; then
+  echo "# $(uname -sr), session ${XDG_SESSION_TYPE:-unknown}"
+  command -v glxinfo >/dev/null && glxinfo -B 2>/dev/null | grep -E 'OpenGL renderer' | sed 's/^/# /'
+fi
+for run in 1:yes 1:color 4:flood 9:flood; do
+  line=$(HERDR_APP_HOME=$home HERDR_SPIKE=$run timeout 200 "$bin" 2>/dev/null | grep '^SPIKE' || true)
+  echo "${line:-SPIKE $run: no result (timed out or crashed)}"
+done

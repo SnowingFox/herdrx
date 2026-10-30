@@ -69,8 +69,7 @@ pub fn term_open(
 ) -> Result<Opened, String> {
     let core = state.core()?;
     let argv = argv.unwrap_or_else(|| vec![std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into()), "-l".into()]);
-    // Kept like the GPUI app's terminals (a terminal started with keep: false
-    // stalled with several panes open: herdr-core 0.1.14); closing kills it.
+    // Kept like the GPUI app's terminals; closing the pane kills it.
     let address = core.run(argv, None, json!({}), None).map_err(|e| format!("{e:#}"))?;
     let attached = core.attach(&address, cols, rows, json!({})).map_err(|e| format!("{e:#}"))?;
     state.started.lock().unwrap().insert(attached.channel, address);
