@@ -1,3 +1,6 @@
 [submodule "vendor/ghostty"]
 	path = vendor/ghostty
 	url = https://github.com/ghostty-org/ghostty
+[submodule "submodule/herdr-app"]
+	path = submodule/herdr-app
+	url = https://github.com/herdrdev/herdr-app.git
